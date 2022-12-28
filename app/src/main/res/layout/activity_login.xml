@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@drawable/bakgradient"
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:background="@drawable/bakgradient"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/relative"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:background="@drawable/shape_rect01"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="15dp"
+                    android:text="FILE CLOUD"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+
+            </LinearLayout>
+
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="350dp"
+                android:layout_height="400dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="70dp"
+                app:cardCornerRadius="20dp"
+                >
+
+                <RelativeLayout
+                    android:id="@+id/card"
+                    android:layout_width="350dp"
+                    android:layout_height="match_parent"
+                    android:elevation="20dp">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="20dp"
+                        android:text="LOGIN"
+                        android:textColor="@color/colorPrimaryDark"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:id="@+id/view"
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="@color/colorPrimaryDark"
+                        android:layout_marginTop="48dp"/>
+
+                    <com.blogspot.atifsoftwares.circularimageview.CircularImageView
+                        android:id="@+id/placeholder"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_centerInParent="true"
+                        android:layout_below="@+id/view"
+                        android:layout_marginTop="16dp"
+                        android:src="@drawable/ic_user_face"
+                        app:c_border_color="@color/colorPrimary"/>
+
+                    <LinearLayout
+                        android:id="@+id/Linear"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/inputs"
+                        android:orientation="vertical"
+                        >
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/textL1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:elevation="20dp"
+                            android:layout_gravity="center"
+                            android:textColorHint="@color/colorGray"
+                            app:boxStrokeColor="@color/colorBlack"
+                            android:padding="5dp">
+
+                            <EditText
+                                android:id="@+id/EmailEt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:drawableStart="@drawable/ic_email"
+                                android:drawablePadding="5dp"
+                                android:autofillHints="emailAddress"
+                                android:inputType="textEmailAddress"
+                                android:hint="Email"
+                                android:textColor="@color/colorBlack"
+                                app:boxBackgroundColor="@color/colorAccent"
+                                android:textSize="18sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/textL2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:elevation="20dp"
+                            android:layout_gravity="center"
+                            android:textColorHint="@color/colorGray"
+                            app:passwordToggleEnabled="true">
+
+                            <EditText
+                                android:id="@+id/PasswordEt"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:drawableStart="@drawable/ic_key"
+                                android:drawablePadding="5dp"
+                                android:layout_marginStart="5dp"
+                                android:hint="Password"
+                                android:autofillHints="password"
+                                android:inputType="textPassword"
+                                app:boxBackgroundColor="@color/colorAccent"
+                                android:textSize="18sp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/loginBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/Linear"
+                        android:layout_centerHorizontal="true"
+                        android:padding="5dp"
+                        android:textSize="16sp"
+                        android:text="LOGIN"
+                        android:layout_marginTop="40dp"
+                        android:textColor="@color/colorWhite"
+                        android:drawableStart="@drawable/ic_person_pin"
+                        android:drawablePadding="5dp"
+                        android:elevation="10dp"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:background="@drawable/shape_bk"
+                        />
+
+
+                </RelativeLayout>
+
+
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/resetTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Forget Password?"
+                android:textColor="@color/colorBlack"
+                android:textStyle="bold"
+                android:layout_marginTop="500dp"
+                android:textSize="15sp"
+                android:layout_centerHorizontal="true"
+
+                />
+
+
+            <Button
+                android:id="@+id/signIn"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textSize="16sp"
+                android:text="REGISTER"
+                android:layout_marginTop="550dp"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/colorWhite"
+                android:drawableStart="@drawable/ic_key"
+                android:drawablePadding="5dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:background="@drawable/login_shape_bk"
+                android:elevation="10dp"/>
+
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+
+
+</ScrollView>

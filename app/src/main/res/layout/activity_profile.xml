@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/R1"
+            android:layout_width="match_parent"
+            android:background="@drawable/shape_rect01"
+            android:layout_height="200dp">
+
+            <RelativeLayout
+                android:id="@+id/Relative"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+
+                <com.blogspot.atifsoftwares.circularimageview.CircularImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:id="@+id/avatarIv"
+                    android:layout_marginTop="40dp"
+                    app:c_border_color="@color/colorWhite"
+                    app:c_border_width="2dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_user_face"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/R1"
+            android:layout_marginTop="5dp">
+
+            <TextView
+                android:id="@+id/userNameTv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorWhite"
+                android:layout_marginTop="20dp"
+                android:hint="Set name for peers to see and send files"
+                android:textColor="@color/colorBlack"
+                android:padding="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:drawablePadding="10dp"
+                app:drawableStartCompat="@drawable/ic_name_dw" />
+
+            <TextView
+                android:id="@+id/userPhoneTv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorWhite"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/colorBlack"
+                android:hint="Phone not set"
+                android:padding="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:drawablePadding="5dp"
+                app:drawableStartCompat="@drawable/ic_phone" />
+
+            <TextView
+                android:id="@+id/userMailTv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorWhite"
+                android:layout_marginTop="5dp"
+                android:hint="Email not set"
+                android:textColor="@color/colorBlack"
+                android:padding="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:drawablePadding="10dp"
+                app:drawableStartCompat="@drawable/ic_email"/>
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/editBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="30dp"
+                android:layout_gravity="end"
+                android:src="@drawable/ic_edit"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+</androidx.core.widget.NestedScrollView>

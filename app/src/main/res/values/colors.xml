@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#13265C</color>
+    <color name="colorPrimaryDark">#1F7FB5</color>
+    <color name="colorAccent">#9D13B4</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorWhite">#ffffff</color>
+    <color name="white">#ffffff</color>
+    <color name="colorGray">#C9C8C8</color>
+    <color name="colorGreen01">#05AA9B</color>
+    <color name="gold">#FFC30F</color>
+    <color name="shadow">#46FFC30F</color>
+    <color name="red">#E71A0C</color>
+    <color name="Green">#3EE210</color>
+    <color name="FB_music">#9C27B0</color>
+    <color name="FB_PDF">#1491E4</color>
+    <color name="FB_PPT">#FF9800</color>
+    <color name="FB_DOC">#00BCD4</color>
+    <color name="FB_EXCEL">#258809</color>
+    <color name="FB_MUSIC">#08C4B2</color>
+    <color name="highlight">#B1E0E0</color>
+    <color name="transparent">#00570C0C</color>
+    <color name="transparent2">#28676464</color>
+    <color name="blue">#08209E</color>
+
+
+
+
+    <color name="colorPurple">#FCCDD9</color>
+    <color name="colorGreen">#DDC2F8</color>
+</resources>

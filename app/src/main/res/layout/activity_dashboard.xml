@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.file.filecloud.Dashboard"
+   >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_above="@+id/toolbar">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tab"
+                android:layout_width="match_parent"
+                app:tabTextColor="@color/colorGray"
+                app:tabSelectedTextColor="@color/colorWhite"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:tabMode="scrollable"
+                android:layout_height="?attr/actionBarSize"/>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewpager"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true">
+
+                <com.blogspot.atifsoftwares.circularimageview.CircularImageView
+                    android:id="@+id/profileIv"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_centerHorizontal="true"
+                    app:c_border_width="1dp"
+                    android:src="@drawable/ic_user_face"
+                    android:scaleType="centerCrop"/>
+
+                <TextView
+                    android:id="@+id/userTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:layout_below="@id/profileIv"
+                    android:layout_centerHorizontal="true"
+                    android:textColor="@color/colorWhite"
+                    android:maxEms="6"
+                    android:textSize="12sp"/>
+
+            </RelativeLayout>
+
+            <ImageButton
+                android:id="@+id/menuBtn"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="10dp"
+                android:src="@drawable/ic_menu"
+                android:background="@null"/>
+        </RelativeLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+
+   <com.getbase.floatingactionbutton.FloatingActionsMenu
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       app:fab_expandDirection="up"
+       app:fab_labelsPosition="left"
+       android:layout_alignParentEnd="true"
+       android:layout_margin="20dp"
+       app:fab_labelStyle="@style/LabelStyle"
+       android:layout_above="@id/toolbar">
+
+       <com.getbase.floatingactionbutton.FloatingActionButton
+           android:id="@+id/pdfFB"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:fab_size="mini"
+           app:fab_colorNormal="@color/FB_PDF"
+           app:fab_title="PDF"
+           app:fab_icon="@drawable/ic_pdf_icon"
+           android:onClick="choosePDF"/>
+
+           <com.getbase.floatingactionbutton.FloatingActionButton
+               android:id="@+id/pptFB"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               app:fab_size="mini"
+               app:fab_colorNormal="@color/FB_PPT"
+               app:fab_title="PPT"
+               app:fab_icon="@drawable/ic_ppt_icon"
+               android:onClick="choosePPT"/>
+
+       <com.getbase.floatingactionbutton.FloatingActionButton
+           android:id="@+id/docFB"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:fab_size="mini"
+           app:fab_colorNormal="@color/FB_DOC"
+           app:fab_title="DOC"
+           app:fab_icon="@drawable/ic_doc_icon"
+           android:onClick="chooseDoc"/>
+
+       <com.getbase.floatingactionbutton.FloatingActionButton
+           android:id="@+id/excelFB"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:fab_size="mini"
+           app:fab_colorNormal="@color/FB_EXCEL"
+           app:fab_title="EXCEL"
+           app:fab_icon="@drawable/ic_excel_icon"
+           android:onClick="chooseExcel"/>
+
+       <com.getbase.floatingactionbutton.FloatingActionButton
+           android:id="@+id/photoFB"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           app:fab_size="mini"
+           app:fab_colorNormal="@color/colorPrimary"
+           app:fab_title="PHOTO"
+           app:fab_icon="@drawable/ic_image_icon"
+           android:onClick="choosePhoto"/>
+
+   </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
+</RelativeLayout>

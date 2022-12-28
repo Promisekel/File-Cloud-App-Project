@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/boarders">
+
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:background="@drawable/shape_rect01"
+        android:layout_height="80dp">
+
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_toEndOf="@id/displayTv"
+            android:background="@color/transparent"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+        </androidx.appcompat.widget.Toolbar>
+
+        <TextView
+            android:id="@+id/displayTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="18dp"
+            android:textColor="@color/colorWhite"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
+
+
+    </RelativeLayout>
+    <com.blogspot.atifsoftwares.circularimageview.CircularImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:id="@+id/peersIconIv"
+        android:layout_marginTop="40dp"
+        app:c_border_color="@color/colorWhite"
+        app:c_border_width="5dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/ic_peers"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/peersRv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/peersIconIv"
+        tools:listitem="@layout/row_peers"
+        android:layout_margin="10dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+    <RelativeLayout
+        android:id="@+id/placeholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+      >
+        <TextView
+            android:id="@+id/placeholder2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Peer Empty!"
+            android:textStyle="bold|italic"
+            android:layout_centerInParent="true"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-condensed"
+            android:padding="10dp"
+            android:textColor="@color/colorBlack"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/placeholder2"
+            android:textStyle="bold|italic"
+            android:text="Search and connect to a peer"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-condensed"
+            android:padding="10dp"
+            android:textColor="@color/colorBlack"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

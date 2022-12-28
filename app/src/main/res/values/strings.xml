@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">File Cloud</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="zero">0:00</string>
+
+    <string name="About_App">File Cloud helps you to save files on your phone without using storage or memory.
+        File Cloud is concern about your privacy and therefore saves your vital documents
+    with secure password privately without being visible on your phone.
+        With just two clicks away you can upload, download, preview and share files with your peers anywhere.</string>
+
+    /*1.File Cloud store your files privately and securely with in-build AppLocker
+    2.File Cloud Helps save your phone storage
+    3. You can upload any type of file to store for use anywhere
+    4. You can download the uploaded files back to your phone
+    5. You can share files with peers within the app privately
+    6.You can preview files privately within the app
+
+    File Cloud saves your phone storage by helping you to upload and save any files privately for easy access without using storage or
+    memory.
+    1. In-Build AppLocker to secure and private your files.
+    2.Upload any files for save storage on the app
+    3. Preview any files on the app
+    4. Connect and share files with peer through the app
+    5. Download files from the app back to your phone.
+    6. In-build Trash-bin to store deleted files until permanently deleted*/
+</resources>
