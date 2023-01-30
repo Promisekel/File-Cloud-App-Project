@@ -634,12 +634,32 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
 
     private void checkpref() {///check if pincode exits
         SharedPreferences shf = getSharedPreferences("passcode.pref",  Context.MODE_PRIVATE);
-        String strPref = shf.getString("passcode", null);
+        final String strPref = shf.getString("passcode", null);
 
-        if(strPref != null) {
-            //Do nothing
-        }else {
-            verifyInfoDialog();
-        }
+        DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users");
+        database.orderByChild("uid").equalTo(uid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    String passcode =""+ ds.child("passcode").getValue();
+
+                    if(strPref != null ) {
+                        //Do nothing
+                        if (passcode.isEmpty()){
+                            verifyInfoDialog();
+                        }
+                    }else {
+                        verifyInfoDialog();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 }
