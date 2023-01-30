@@ -124,6 +124,7 @@ public class Sign_Up extends AppCompatActivity {
                             hashMap.put("image", "");
                             hashMap.put("phone", "");
                             hashMap.put("passcode", "");
+                            hashMap.put("pincode", "");
 
                             FirebaseDatabase database = FirebaseDatabase.getInstance();
                             DatabaseReference reference = database.getReference("Users");
