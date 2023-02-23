@@ -2,9 +2,9 @@ package com.file.filecloud;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -12,7 +12,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,21 +59,24 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
     FirebaseAuth auth;
     FirebaseUser user;
 
+    Activity fa;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout.pin_verification);
 
-
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
         uid=auth.getUid();
+
 
         initializeComponents();
 
 
     }
-
 
 
 
@@ -108,6 +113,7 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
         btn_09.setOnClickListener(this);
         btn_00.setOnClickListener(this);
         btn_clear.setOnClickListener(this);
+
 
         forgetPinTv.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,13 +181,13 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
     }
 
     private void passNumber(ArrayList<String> numbers_list) {
-        if (numbers_list.size() == 0){
+        if (numbers_list.size() == 0) {
             view_01.setBackgroundResource(drawable.bg_view_gray_ova);
             view_02.setBackgroundResource(drawable.bg_view_gray_ova);
             view_03.setBackgroundResource(drawable.bg_view_gray_ova);
             view_04.setBackgroundResource(drawable.bg_view_gray_ova);
-        }else{
-            switch (numbers_list.size()){
+        } else {
+            switch (numbers_list.size()) {
                 case 1:
                     num_01 = numbers_list.get(0);
                     view_01.setBackgroundResource(drawable.bg_view_blue_oval);
@@ -198,9 +204,9 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                     num_04 = numbers_list.get(3);
                     view_04.setBackgroundResource(drawable.bg_view_blue_oval);
                     passCode = num_01 + num_02 + num_03 + num_04;
-                    if (passCode.length() == 0) {
-                        numbers_list.clear();
-                    }else {
+                    if (getPassCode().length() == 0) {
+                        savePassCode(passCode);
+                    } else {
                         matchPassCode();
                     }
                     break;
@@ -210,37 +216,22 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
     }
 
     private void matchPassCode() {
-        DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users");
-        database.orderByChild("uid").equalTo(uid).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    String pincode = "" + ds.child("pincode").getValue();
-                    if (pincode.equals(passCode)){
-                        resultTv.setText("Nice!!");
-                        resultTv.setTextColor(Color.parseColor("#FFFFFF"));
-                        lockIcon.setImageResource(drawable.ic_verified02);
-                        startActivity(new Intent(PinVerification.this,Dashboard.class));
-                        finish();
-                    }else{
-                        numbers_list.clear();
-                        passNumber(numbers_list);
-                        resultTv.setText("incorrect try again");
-                        resultTv.setTextColor(Color.parseColor("#E71A0C"));
-                        resultTv.setText("incorrect try again");
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
+        if (getPassCode().equals(passCode)) {
+            startActivity(new Intent(this, Dashboard.class));
+            lockIcon.setImageResource(drawable.ic_verified02);
+            resultTv.setText("NICE!!!");
+            resultTv.setTextColor(Color.parseColor("#00FF00"));
+            finish();
+        } else {
+            numbers_list.clear();
+            passNumber(numbers_list);
+            resultTv.setText("incorrect try again");
+            resultTv.setTextColor(Color.parseColor("#E71A0C"));
+            resultTv.setText("incorrect try again");
+        }
     }
 
-    /*private SharedPreferences.Editor savePassCode(String passCode){
+    private SharedPreferences.Editor savePassCode(String passCode) {
         SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("passcode", passCode);
@@ -248,10 +239,11 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
 
         return editor;
     }
-    private String getPassCode(){
-    SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
-    return preferences.getString("passcode","");
-    }*/
+
+    private String getPassCode() {
+        SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
+        return preferences.getString("passcode", "");
+    }
 
     private void ShowRecoverPassCodeDialog() {
         View view = LayoutInflater.from(this).inflate(layout.register_pin_dialog, null);
@@ -298,7 +290,7 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                 if (TextUtils.isEmpty(passCode)) {
                     setpassEt.setHint("Provide your secret recovery password");
                     setpassEt.setHintTextColor(color.red);
-                }else{
+                } else {
                     final ProgressDialog progressDialog = new ProgressDialog(PinVerification.this);
                     progressDialog.setMessage("Recovering Pincode Please Wait....");
                     progressDialog.show();
@@ -308,8 +300,8 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             for (DataSnapshot ds : snapshot.getChildren()) {
-                                String passcode =""+ ds.child("passcode").getValue();
-                                String pincode =""+ ds.child("pincode").getValue();
+                                String passcode = "" + ds.child("passcode").getValue();
+                                String pincode = "" + ds.child("pincode").getValue();
                                 if (passcode.equals(passCode)) {
 
                                     /*SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
@@ -320,12 +312,12 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                                     editor.apply();*/
                                     /*SharedPreferences shf = getSharedPreferences("passcode.pref",  Context.MODE_PRIVATE);
                                     String strPref = shf.getString("passcode", null);*/
-                                    if (pincode != null){
+                                    if (pincode != null) {
                                         setpinBtn.setVisibility(View.GONE);
                                         setpassEt.setTextColor(color.red);
                                         setpassEt.setText(pincode);
                                         dialogTitle.setText("Your Pincode");
-                                    }else{
+                                    } else {
                                         progressDialog.dismiss();
                                         alertDialog.dismiss();
                                         View view = LayoutInflater.from(PinVerification.this).inflate(R.layout.warning_dialog, null);
@@ -417,7 +409,6 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
         });
     }
 
-
     private void ShowResetPassCodeDialog() {
         View view = LayoutInflater.from(this).inflate(layout.register_pin_dialog, null);
         final Button setpinBtn = view.findViewById(R.id.setpinBtn);
@@ -429,7 +420,6 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
         pinEt.setHint("Enter your new 4 digit pincode");
         setpassEt.setHint("Provide your secret recovery password");
         dialogTitle.setText("Reset your pincode");
-
 
 
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
@@ -445,22 +435,22 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
 
                 final String pinRest = pinEt.getText().toString().trim();
                 final String passCode = setpassEt.getText().toString().trim();
-                if (TextUtils.isEmpty(pinRest)){
+                if (TextUtils.isEmpty(pinRest)) {
                     pinEt.setHint("Pincode cannot be empty");
                     pinEt.setHintTextColor(color.red);
                     //Toast.makeText(PinVerification.this, "Please Enter a 4 digit pincode", Toast.LENGTH_LONG).show();
 
-                }else if (pinRest.length()<4){
+                } else if (pinRest.length() < 4) {
                     Toast.makeText(PinVerification.this, "Pincode must be more than 4 digits", Toast.LENGTH_LONG).show();
 
-                }else if (pinRest.length()>4){
+                } else if (pinRest.length() > 4) {
                     Toast.makeText(PinVerification.this, "Pincode must be 4 digits", Toast.LENGTH_LONG).show();
-                }else if (TextUtils.isEmpty(passCode)) {
+                } else if (TextUtils.isEmpty(passCode)) {
                     setpassEt.setHint("Provide your secret recovery password");
                     setpassEt.setHintTextColor(color.red);
                     Toast.makeText(PinVerification.this, "Provide your secret recovery password", Toast.LENGTH_LONG).show();
 
-                }else{
+                } else {
                     final ProgressDialog progressDialog = new ProgressDialog(PinVerification.this);
                     progressDialog.setMessage("Resetting Pincode Please Wait....");
                     progressDialog.show();
@@ -470,10 +460,10 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             for (DataSnapshot ds : snapshot.getChildren()) {
-                                String passcode =""+ ds.child("passcode").getValue();
+                                String passcode = "" + ds.child("passcode").getValue();
                                 if (passcode.equals(passCode)) {
 
-                                    HashMap<String,Object> hashMap = new HashMap<>();
+                                    HashMap<String, Object> hashMap = new HashMap<>();
                                     hashMap.put("passcode", passCode);
                                     hashMap.put("pincode", pinRest);
 
@@ -483,13 +473,13 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()){
-                                        /*SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
-                                                            SharedPreferences.Editor editor = preferences.edit();
-                                                            editor.remove("passcode");
-                                                            editor.apply();
-                                                            editor.putString("passcode", pinRest);
-                                                            editor.apply();*/
+                                                    if (task.isSuccessful()) {
+                                                        SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
+                                                        SharedPreferences.Editor editor = preferences.edit();
+                                                        editor.remove("passcode");
+                                                        editor.apply();
+                                                        editor.putString("passcode", pinRest);
+                                                        editor.apply();
 
                                                         progressDialog.dismiss();
                                                         alertDialog.dismiss();
@@ -515,8 +505,8 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                                                             }
                                                         });
 
-                                                    }else {
-                                                        Toast.makeText(PinVerification.this,"Error try again", Toast.LENGTH_LONG).show();
+                                                    } else {
+                                                        Toast.makeText(PinVerification.this, "Error try again", Toast.LENGTH_LONG).show();
 
                                                     }
 
@@ -524,10 +514,9 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                                             }).addOnFailureListener(new OnFailureListener() {
                                                 @Override
                                                 public void onFailure(@NonNull Exception e) {
-                                                    Toast.makeText(PinVerification.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                                                    Toast.makeText(PinVerification.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
                                                 }
                                             });
-
 
 
                                 } else {
@@ -614,21 +603,20 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                 final String pinRest = pinEt.getText().toString().trim();
                 final String passCode = setpassEt.getText().toString().trim();
 
-                if (TextUtils.isEmpty(pinRest)){
+                if (TextUtils.isEmpty(pinRest)) {
                     Toast.makeText(PinVerification.this, "Please Enter a 4 digit pincode", Toast.LENGTH_LONG).show();
 
-                }else if (pinRest.length()<4){
+                } else if (pinRest.length() < 4) {
                     Toast.makeText(PinVerification.this, "Please Enter a 4 digit pincode", Toast.LENGTH_LONG).show();
 
-                }else if (pinRest.length()>4){
+                } else if (pinRest.length() > 4) {
                     Toast.makeText(PinVerification.this, "Please Enter a 4 digit pincode", Toast.LENGTH_LONG).show();
-                }else if (passCode.isEmpty()){
+                } else if (passCode.isEmpty()) {
                     Toast.makeText(PinVerification.this, "Please provide a secret recovery password", Toast.LENGTH_LONG).show();
                     setpassEt.setHintTextColor(getResources().getColor(R.color.red));
-                }
-                else {
+                } else {
 
-                    HashMap<String,Object> hashMap = new HashMap<>();
+                    HashMap<String, Object> hashMap = new HashMap<>();
                     hashMap.put("passcode", passCode);
                     hashMap.put("pincode", pinRest);
 
@@ -638,20 +626,20 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()){
-                                        /*SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
-                                                            SharedPreferences.Editor editor = preferences.edit();
-                                                            editor.remove("passcode");
-                                                            editor.apply();
-                                                            editor.putString("passcode", pinRest);
-                                                            editor.apply();*/
+                                    if (task.isSuccessful()) {
+                                        SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = preferences.edit();
+                                        editor.remove("passcode");
+                                        editor.apply();
+                                        editor.putString("passcode", pinRest);
+                                        editor.apply();
                                         alertDialog.dismiss();
                                         Dialog.dismiss();
-                                        Toast toast = Toast.makeText(PinVerification.this,"You can now enter your new Pin code",Toast.LENGTH_LONG);
-                                        toast.setGravity(Gravity.CENTER,0,0);
+                                        Toast toast = Toast.makeText(PinVerification.this, "You can now enter your new Pin code", Toast.LENGTH_LONG);
+                                        toast.setGravity(Gravity.CENTER, 0, 0);
                                         toast.show();
-                                    }else {
-                                        Toast.makeText(PinVerification.this,"Error try again", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(PinVerification.this, "Error try again", Toast.LENGTH_LONG).show();
 
                                     }
 
@@ -659,12 +647,11 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(PinVerification.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(PinVerification.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             });
 
                 }
-
 
 
             }
@@ -677,15 +664,14 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
 
         if (user != null && user.isEmailVerified()) {
             checkpref();
-        }
-        else {
+        } else {
             startActivity(new Intent(PinVerification.this, LoginActivity.class));
         }
         super.onStart();
     }
 
     private void checkpref() {///check if pincode exits
-        SharedPreferences shf = getSharedPreferences("passcode.pref",  Context.MODE_PRIVATE);
+        SharedPreferences shf = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
         final String strPref = shf.getString("passcode", null);
 
         DatabaseReference database = FirebaseDatabase.getInstance().getReference("Users");
@@ -693,14 +679,14 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot ds : snapshot.getChildren()) {
-                    String passcode =""+ ds.child("passcode").getValue();
-                    String pincode =""+ ds.child("pincode").getValue();
+                    String passcode = "" + ds.child("passcode").getValue();
+                    String pincode = "" + ds.child("pincode").getValue();
 
-                    if(pincode != null ) {
-                        if (pincode.isEmpty()){
+                    if (pincode != null) {
+                        if (pincode.isEmpty()) {
                             verifyInfoDialog();
                         }
-                    }else {
+                    } else {
                         verifyInfoDialog();
                     }
                 }

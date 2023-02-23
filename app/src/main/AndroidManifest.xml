@@ -45,6 +45,10 @@
         <activity
             android:name="com.file.filecloud.PreviewFile"
             android:theme="@style/AppTheme.CustomTheme" />
+
+        <activity
+            android:name="com.file.filecloud.UploadFile"
+            android:theme="@style/AppTheme.CustomTheme" />
         <activity
             android:name="com.file.filecloud.ProfileActivity"
             android:theme="@style/AppTheme.CustomTheme" />
@@ -53,7 +57,7 @@
             android:theme="@style/AppThemeActionBar" />
         <activity
             android:name="com.file.filecloud.Dashboard"
-            android:theme="@style/AppThemeActionBar" />
+            android:theme="@style/AppThemeActionBar"/>
         <activity android:name="com.file.filecloud.PinVerification"
             android:exported="true">
             <intent-filter>

@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -45,6 +46,7 @@ import com.file.filecloud.Tabs.PDF_Fragment;
 import com.file.filecloud.Tabs.PPT_Fragment;
 import com.file.filecloud.Tabs.Photo_Fragment;
 import com.file.cloud.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -113,6 +115,8 @@ public class Dashboard extends AppCompatActivity {
     private AnstronCoreHelper coreHelper;
     private ArrayList<Uri> ImageUris;
     int position = 0;
+
+    private PinVerification pinVerification;
 
 
     @Override
@@ -629,7 +633,6 @@ public class Dashboard extends AppCompatActivity {
 
             } else if (data.getData() != null) {
                 uploadSingleFile(requestCode, data);
-
             }
 
         } else if (requestCode == RESULT_CODE_PPT && resultCode == RESULT_OK) {
@@ -976,11 +979,13 @@ public class Dashboard extends AppCompatActivity {
 
     private void uploadSingleFile(final int requestCode, Intent data) {
 
+
         fileUri = data.getData();
         final String filename = getFileName(fileUri, data);
 
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(Dashboard.this);
 
-        View view = LayoutInflater.from(Dashboard.this).inflate(R.layout.upload_single_file_dialog, null);
+        View view = getLayoutInflater().inflate(R.layout.upload_single_file_dialog, null);
         final TextView fileStatus = view.findViewById(R.id.fileStatus);
         final TextView fileName = view.findViewById(R.id.fileName);
         ImageView closeBtn = view.findViewById(R.id.closeBtn);
@@ -993,13 +998,14 @@ public class Dashboard extends AppCompatActivity {
         fileName.setText(filename);
         fileStatus.setText("Uploading (1) File");
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(Dashboard.this);
-        builder.setView(view);
-        builder.setCancelable(false);
+        alertDialog.setView(view);
+        alertDialog.setCancelable(false);
 
-        final AlertDialog dialog = builder.create();
+        final AlertDialog dialog = alertDialog.create();
         dialog.show();
 
+        ic_done.setVisibility(GONE);
+        progress.setVisibility(VISIBLE);
         String filePathName = "";
 
         if (requestCode == RESULT_CODE_MUSIC) {
@@ -1056,13 +1062,15 @@ public class Dashboard extends AppCompatActivity {
                             DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
                             ref.child(uid).child("Files").child(timestamp)
                                     .updateChildren(hashMap)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
-                                        public void onSuccess(Void aVoid) {
-                                            progress.setVisibility(GONE);
-                                            ic_done.setVisibility(VISIBLE);
-                                            fileStatus.setText("Upload Successful...");
-                                            Toast.makeText(Dashboard.this, "" + filename + "Successfully Uploaded", Toast.LENGTH_LONG).show();
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isComplete()){
+                                                progress.setVisibility(GONE);
+                                                ic_done.setVisibility(VISIBLE);
+                                                fileStatus.setText("Upload Successful...");
+                                                Toast.makeText(Dashboard.this, "" + filename + "Successfully Uploaded", Toast.LENGTH_LONG).show();
+                                            }
                                         }
                                     })
                                     .addOnFailureListener(new OnFailureListener() {

@@ -152,6 +152,7 @@ public class PeersActivity extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
         MenuItem item1 = menu.findItem(R.id.logout).setVisible(false);
+        MenuItem item2 = menu.findItem(R.id.aboutApp).setVisible(false);
 
         // return true so that the menu pop up is opened
         MenuItem item = menu.findItem(R.id.search);

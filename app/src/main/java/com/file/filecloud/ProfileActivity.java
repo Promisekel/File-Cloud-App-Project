@@ -77,6 +77,8 @@ public class ProfileActivity extends AppCompatActivity {
         uid = auth.getUid();
         user = auth.getCurrentUser();
 
+
+
         final TextView userMailTv = findViewById(R.id.userMailTv);
         final TextView userPhoneTv = findViewById(R.id.userPhoneTv);
         final TextView userNameTv = findViewById(R.id.userNameTv);
