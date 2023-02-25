@@ -6,15 +6,19 @@ import android.app.KeyguardManager;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.fingerprint.FingerprintManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.support.v4.media.MediaBrowserCompat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,6 +43,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.anstrontechnologies.corehelper.AnstronCoreHelper;
 import com.file.filecloud.Adapter.TabAdapter;
 import com.file.filecloud.Adapter.UploadFileAdapter;
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.RecievedFiles.RecievedFiles;
 import com.file.filecloud.Tabs.DOC_Fragment;
 import com.file.filecloud.Tabs.Excel_Fragment;
@@ -116,7 +121,7 @@ public class Dashboard extends AppCompatActivity {
     private ArrayList<Uri> ImageUris;
     int position = 0;
 
-    private PinVerification pinVerification;
+
 
 
     @Override
@@ -149,6 +154,7 @@ public class Dashboard extends AppCompatActivity {
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
+
 
 
         final DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
@@ -261,6 +267,16 @@ public class Dashboard extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        boolean isScreenOn = pm.isInteractive();
+        if (!isScreenOn) {
+            startActivity(new Intent(Dashboard.this, PinVerification.class));
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         boolean isScreenOn = pm.isInteractive();
         if (!isScreenOn) {
@@ -979,130 +995,152 @@ public class Dashboard extends AppCompatActivity {
 
     private void uploadSingleFile(final int requestCode, Intent data) {
 
-
-        fileUri = data.getData();
-        final String filename = getFileName(fileUri, data);
-
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(Dashboard.this);
-
-        View view = getLayoutInflater().inflate(R.layout.upload_single_file_dialog, null);
-        final TextView fileStatus = view.findViewById(R.id.fileStatus);
-        final TextView fileName = view.findViewById(R.id.fileName);
-        ImageView closeBtn = view.findViewById(R.id.closeBtn);
-        final ProgressBar progress = view.findViewById(R.id.progress);
-        final ImageView ic_done = view.findViewById(R.id.ic_done);
-
-        ic_done.setVisibility(GONE);
-        progress.setVisibility(VISIBLE);
-
-        fileName.setText(filename);
-        fileStatus.setText("Uploading (1) File");
-
-        alertDialog.setView(view);
-        alertDialog.setCancelable(false);
-
-        final AlertDialog dialog = alertDialog.create();
-        dialog.show();
-
-        ic_done.setVisibility(GONE);
-        progress.setVisibility(VISIBLE);
-        String filePathName = "";
-
-        if (requestCode == RESULT_CODE_MUSIC) {
-            filePathName = "MUSIC_SINGLE_FILES/" + filename;
-        }
-        if (requestCode == RESULT_CODE_PDF) {
-            filePathName = "PDF_SINGLE_FILES/" + filename;
-        }
-        if (requestCode == RESULT_CODE_PPT) {
-            filePathName = "PPT_SINGLE_FILES/" + filename;
-        }
-        if (requestCode == RESULT_CODE_DOC) {
-            filePathName = "DOC_SINGLE_FILES/" + filename;
-        }
-        if (requestCode == RESULT_CODE_EXCEL) {
-            filePathName = "EXCEL_SINGLE_FILES/" + filename;
-        }
-
-
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference(uid).child(filePathName);
-        storageReference.putFile(fileUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                        while (!uriTask.isSuccessful()) ;
-                        String downloadUri = uriTask.getResult().toString();
-                        if (uriTask.isSuccessful()) {
-
-                            String timestamp = String.valueOf(System.currentTimeMillis());
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("uid", uid);
-                            hashMap.put("fileName", filename);
-                            hashMap.put("fileUri", downloadUri);
-                            hashMap.put("timestamp", timestamp);
-
-                            if (requestCode == RESULT_CODE_MUSIC) {
-                                hashMap.put("type", "AUDIO");
+        if (!NetworkConnection.isNetworkAvailable(Dashboard.this)){
+            new androidx.appcompat.app.AlertDialog.Builder(Dashboard.this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("No Internet Connection")
+                    .setMessage("Restore Internet connectivity and try again")
+                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
                             }
-                            if (requestCode == RESULT_CODE_PDF) {
-                                hashMap.put("type", "PDF");
-                                hashMap.put("fileName", filename);
-                            }
-                            if (requestCode == RESULT_CODE_PPT) {
-                                hashMap.put("type", "PPT");
-                            }
-                            if (requestCode == RESULT_CODE_DOC) {
-                                hashMap.put("type", "DOC");
-                            }
-                            if (requestCode == RESULT_CODE_EXCEL) {
-                                hashMap.put("type", "EXCEL");
-                            }
-
-                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-                            ref.child(uid).child("Files").child(timestamp)
-                                    .updateChildren(hashMap)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isComplete()){
-                                                progress.setVisibility(GONE);
-                                                ic_done.setVisibility(VISIBLE);
-                                                fileStatus.setText("Upload Successful...");
-                                                Toast.makeText(Dashboard.this, "" + filename + "Successfully Uploaded", Toast.LENGTH_LONG).show();
-                                            }
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            progress.setVisibility(GONE);
-                                            ic_done.setImageResource(R.drawable.fingerprint_dialog_error_to_fp);
-                                            Toast.makeText(Dashboard.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
-
-                                        }
-                                    });
                         }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }else {
 
+            fileUri = data.getData();
+            final String filename = getFileName(fileUri, data);
 
-                        Toast.makeText(Dashboard.this, " " + filename + " Successfully Uploaded", Toast.LENGTH_LONG).show();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(Dashboard.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(Dashboard.this);
 
+            View view = getLayoutInflater().inflate(R.layout.upload_single_file_dialog, null);
+            final TextView fileStatus = view.findViewById(R.id.fileStatus);
+            final TextView fileName = view.findViewById(R.id.fileName);
+            ImageView closeBtn = view.findViewById(R.id.closeBtn);
+            final ProgressBar progress = view.findViewById(R.id.progress);
+            final ImageView ic_done = view.findViewById(R.id.ic_done);
+
+            ic_done.setVisibility(GONE);
+            progress.setVisibility(VISIBLE);
+
+            fileName.setText(filename);
+            fileStatus.setText("Uploading (1) File");
+
+            alertDialog.setView(view);
+            alertDialog.setCancelable(false);
+
+            final AlertDialog dialog = alertDialog.create();
+            dialog.show();
+
+            ic_done.setVisibility(GONE);
+            progress.setVisibility(VISIBLE);
+            String filePathName = "";
+
+            if (requestCode == RESULT_CODE_MUSIC) {
+                filePathName = "MUSIC_SINGLE_FILES/" + filename;
             }
-        });
-
-        closeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
+            if (requestCode == RESULT_CODE_PDF) {
+                filePathName = "PDF_SINGLE_FILES/" + filename;
             }
-        });
+            if (requestCode == RESULT_CODE_PPT) {
+                filePathName = "PPT_SINGLE_FILES/" + filename;
+            }
+            if (requestCode == RESULT_CODE_DOC) {
+                filePathName = "DOC_SINGLE_FILES/" + filename;
+            }
+            if (requestCode == RESULT_CODE_EXCEL) {
+                filePathName = "EXCEL_SINGLE_FILES/" + filename;
+            }
+
+
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference(uid).child(filePathName);
+            storageReference.putFile(fileUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                            while (!uriTask.isSuccessful()) ;
+                            String downloadUri = uriTask.getResult().toString();
+                            if (uriTask.isSuccessful()) {
+
+                                String timestamp = String.valueOf(System.currentTimeMillis());
+                                HashMap<String, Object> hashMap = new HashMap<>();
+                                hashMap.put("uid", uid);
+                                hashMap.put("fileName", filename);
+                                hashMap.put("fileUri", downloadUri);
+                                hashMap.put("timestamp", timestamp);
+
+                                if (requestCode == RESULT_CODE_MUSIC) {
+                                    hashMap.put("type", "AUDIO");
+                                }
+                                if (requestCode == RESULT_CODE_PDF) {
+                                    hashMap.put("type", "PDF");
+                                    hashMap.put("fileName", filename);
+                                }
+                                if (requestCode == RESULT_CODE_PPT) {
+                                    hashMap.put("type", "PPT");
+                                }
+                                if (requestCode == RESULT_CODE_DOC) {
+                                    hashMap.put("type", "DOC");
+                                }
+                                if (requestCode == RESULT_CODE_EXCEL) {
+                                    hashMap.put("type", "EXCEL");
+                                }
+
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+                                ref.child(uid).child("Files").child(timestamp)
+                                        .updateChildren(hashMap)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isComplete()){
+                                                    progress.setVisibility(GONE);
+                                                    ic_done.setVisibility(VISIBLE);
+                                                    fileStatus.setText("Upload Successful...");
+                                                    Toast.makeText(Dashboard.this, "" + filename + "Successfully Uploaded", Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                progress.setVisibility(GONE);
+                                                ic_done.setImageResource(R.drawable.fingerprint_dialog_error_to_fp);
+                                                Toast.makeText(Dashboard.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
+
+                                            }
+                                        });
+                            }
+
+
+                            Toast.makeText(Dashboard.this, " " + filename + " Successfully Uploaded", Toast.LENGTH_LONG).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(Dashboard.this, "" + e.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
+
+            closeBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
+
+        }
+
+
 
     }
+
+
 
     /*private void uploadMultipleFiles(final int requestCode, Intent data) {
         for (int i = 0; i < data.getClipData().getItemCount(); i++) {
@@ -1340,6 +1378,8 @@ public class Dashboard extends AppCompatActivity {
             }
         });
     }};*/
+
+
 }
 
 

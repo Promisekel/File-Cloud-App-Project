@@ -13,6 +13,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.Settings;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -35,6 +36,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.ModelClass.Files_Model;
 import com.file.filecloud.PreviewFile;
 import com.file.filecloud.Tabs.shareListActivity;
@@ -112,7 +114,23 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        begidelete(uid, timestamp, fileName, fileUri, type);
+                                        if (!NetworkConnection.isNetworkAvailable(context)){
+                                            new androidx.appcompat.app.AlertDialog.Builder(context)
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .setTitle("No Internet Connection")
+                                                    .setMessage("Restore Internet connectivity and try again")
+                                                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                            }
+                                                        }
+                                                    })
+                                                    .setNegativeButton("Cancel", null)
+                                                    .show();
+                                        }else {
+                                        begidelete(uid, timestamp, fileName, fileUri, type);}
 
                                     }
                                 })
@@ -137,7 +155,23 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
                 holder.share.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        shareFile(uid, timestamp, fileName, fileUri, type);
+                        if (!NetworkConnection.isNetworkAvailable(context)){
+                            new androidx.appcompat.app.AlertDialog.Builder(context)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setTitle("No Internet Connection")
+                                    .setMessage("Restore Internet connectivity and try again")
+                                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                            }
+                                        }
+                                    })
+                                    .setNegativeButton("Cancel", null)
+                                    .show();
+                        }else {
+                        shareFile(uid, timestamp, fileName, fileUri, type);}
                     }
                 });
 
@@ -441,13 +475,29 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
 
 
     private void shareFile(String uid, String timestamp, String fileName, String fileUri, String type) {
+        if (!NetworkConnection.isNetworkAvailable(context)){
+            new androidx.appcompat.app.AlertDialog.Builder(context)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("No Internet Connection")
+                    .setMessage("Restore Internet connectivity and try again")
+                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }else {
         Intent intent = new Intent(context, shareListActivity.class);
         intent.putExtra("myUid", uid);
         intent.putExtra("timestamp", timestamp);
         intent.putExtra("fileName", fileName);
         intent.putExtra("fileUri", fileUri);
         intent.putExtra("type", type);
-        context.startActivity(intent);
+        context.startActivity(intent);}
     }
 
 
@@ -480,16 +530,33 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
                         public void onClick(View v) {
 
                             if (!TextUtils.isEmpty(fileName)) {
+                                if (!NetworkConnection.isNetworkAvailable(context)){
+                                    new androidx.appcompat.app.AlertDialog.Builder(context)
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .setTitle("No Internet Connection")
+                                            .setMessage("Restore Internet connectivity and try again")
+                                            .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                        context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                    }
+                                                }
+                                            })
+                                            .setNegativeButton("Cancel", null)
+                                            .show();
+                                }else {
 
-                                String fileName = fileNamEt.getText().toString().trim();
+                                    String fileName = fileNamEt.getText().toString().trim();
 
-                                switch (type) {
-                                    case "DOC":
-                                    case "PDF":
-                                    case "PPT":
-                                    case "EXCEL":
-                                        sendFile(timestamp, fileName);
-                                        break;
+                                    switch (type) {
+                                        case "DOC":
+                                        case "PDF":
+                                        case "PPT":
+                                        case "EXCEL":
+                                            sendFile(timestamp, fileName);
+                                            break;
+                                    }
                                 }
                             } else {
                                 Toast.makeText(context, "Please Enter a file name", Toast.LENGTH_SHORT).show();
@@ -542,6 +609,22 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (!NetworkConnection.isNetworkAvailable(context)){
+                    new androidx.appcompat.app.AlertDialog.Builder(context)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("No Internet Connection")
+                            .setMessage("Restore Internet connectivity and try again")
+                            .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                    }
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }else {
                     DownloadManager downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
                     Uri uri = Uri.parse(fileUri);
                     DownloadManager.Request request = new DownloadManager.Request(uri);
@@ -571,7 +654,7 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
 
                     Toast toast = Toast.makeText(context, "Downloading to Documents/File Cloud/", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, 0, 0);
-                    toast.show();
+                    toast.show();}
 
             }
 
@@ -584,7 +667,23 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
     }
 
     private void begidelete(final String uid, final String timestamp, final String fileName, final String fileUri, final String type) {
-            final ProgressDialog progress = new ProgressDialog(context);
+        if (!NetworkConnection.isNetworkAvailable(context)){
+            new androidx.appcompat.app.AlertDialog.Builder(context)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("No Internet Connection")
+                    .setMessage("Restore Internet connectivity and try again")
+                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }else {
+        final ProgressDialog progress = new ProgressDialog(context);
             progress.setMessage("moving...");
             progress.setCancelable(false);
             progress.setCanceledOnTouchOutside(false);
@@ -648,7 +747,7 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                 }
-            });
+            });}
     }
 
     @Override

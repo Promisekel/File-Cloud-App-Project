@@ -3,9 +3,12 @@ package com.file.filecloud.Adapter;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.provider.Settings;
 import android.text.format.DateFormat;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -24,6 +27,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.ModelClass.UserTrashModel;
 import com.file.cloud.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -109,7 +113,23 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);
+                                        if (!NetworkConnection.isNetworkAvailable(context)){
+                                            new androidx.appcompat.app.AlertDialog.Builder(context)
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .setTitle("No Internet Connection")
+                                                    .setMessage("Restore Internet connectivity and try again")
+                                                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                            }
+                                                        }
+                                                    })
+                                                    .setNegativeButton("Cancel", null)
+                                                    .show();
+                                        }else {
+                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);}
                                     }
                                 })
                                 .setNegativeButton("No", null)
@@ -156,7 +176,23 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);
+                                        if (!NetworkConnection.isNetworkAvailable(context)){
+                                            new androidx.appcompat.app.AlertDialog.Builder(context)
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .setTitle("No Internet Connection")
+                                                    .setMessage("Restore Internet connectivity and try again")
+                                                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                            }
+                                                        }
+                                                    })
+                                                    .setNegativeButton("Cancel", null)
+                                                    .show();
+                                        }else {
+                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);}
                                     }
                                 })
                                 .setNegativeButton("No", null)
@@ -206,7 +242,23 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);
+                                        if (!NetworkConnection.isNetworkAvailable(context)){
+                                            new androidx.appcompat.app.AlertDialog.Builder(context)
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .setTitle("No Internet Connection")
+                                                    .setMessage("Restore Internet connectivity and try again")
+                                                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                            }
+                                                        }
+                                                    })
+                                                    .setNegativeButton("Cancel", null)
+                                                    .show();
+                                        }else {
+                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);}
                                     }
                                 })
                                 .setNegativeButton("No", null)
@@ -306,7 +358,23 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);
+                                        if (!NetworkConnection.isNetworkAvailable(context)){
+                                            new androidx.appcompat.app.AlertDialog.Builder(context)
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .setTitle("No Internet Connection")
+                                                    .setMessage("Restore Internet connectivity and try again")
+                                                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                            }
+                                                        }
+                                                    })
+                                                    .setNegativeButton("Cancel", null)
+                                                    .show();
+                                        }else {
+                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);}
                                     }
                                 })
                                 .setNegativeButton("No", null)
@@ -407,7 +475,23 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);
+                                        if (!NetworkConnection.isNetworkAvailable(context)){
+                                            new androidx.appcompat.app.AlertDialog.Builder(context)
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .setTitle("No Internet Connection")
+                                                    .setMessage("Restore Internet connectivity and try again")
+                                                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                            }
+                                                        }
+                                                    })
+                                                    .setNegativeButton("Cancel", null)
+                                                    .show();
+                                        }else {
+                                        restore(timestamp, uid, type, deleteTimestamp, fileName, fileUri, DeleteTypeReceived);}
                                     }
                                 })
                                 .setNegativeButton("No", null)
@@ -464,6 +548,22 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
     }
 
     private void deletePermanently(String deleteTimestamp, String uid) {
+        if (!NetworkConnection.isNetworkAvailable(context)){
+            new androidx.appcompat.app.AlertDialog.Builder(context)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("No Internet Connection")
+                    .setMessage("Restore Internet connectivity and try again")
+                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                            }
+                        }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }else {
             final ProgressDialog progress = new ProgressDialog(context);
             progress.setMessage("Deleting...");
             progress.setCancelable(false);
@@ -496,13 +596,12 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
-            });
+            });}
 
     }
 
     private void restore(final String timestamp, final String uid, final String type, final String deleteTimestamp, final String fileName, final String fileUri, String DeleteTypeReceived) {
-        ConnectivityManager connect = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            final ProgressDialog progress = new ProgressDialog(context);progress.setMessage("Restoring...");
+        final ProgressDialog progress = new ProgressDialog(context);progress.setMessage("Restoring...");
             progress.setCancelable(false);
             progress.setCanceledOnTouchOutside(false);
             progress.show();

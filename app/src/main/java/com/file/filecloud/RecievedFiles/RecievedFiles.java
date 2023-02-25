@@ -57,4 +57,13 @@ public class RecievedFiles extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        boolean isScreenOn = pm.isInteractive();
+        if (!isScreenOn) {
+            startActivity(new Intent(RecievedFiles.this, PinVerification.class));
+        }
+    }
 }

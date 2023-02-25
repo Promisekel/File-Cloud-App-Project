@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,6 +25,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.file.filecloud.Dashboard;
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.ModelClass.ModelPeers;
 import com.file.filecloud.Tabs.viewpeerphoto;
 import com.file.cloud.R;
@@ -172,6 +176,22 @@ public class AdapterPeers extends RecyclerView.Adapter<AdapterPeers.HolderPeers>
 
                 } if (id == 1){
 
+                    if (!NetworkConnection.isNetworkAvailable(context)){
+                        new androidx.appcompat.app.AlertDialog.Builder(context)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("No Internet Connection")
+                                .setMessage("Restore Internet connectivity and try again")
+                                .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show();
+                    }else {
                         new AlertDialog.Builder(context)
                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                 .setTitle("Remove?")
@@ -179,11 +199,12 @@ public class AdapterPeers extends RecyclerView.Adapter<AdapterPeers.HolderPeers>
                                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        removePeer(uid,dialog);
+                                        removePeer(uid, dialog);
                                     }
                                 })
                                 .setNegativeButton("No", null)
                                 .show();
+                    }
 
                 }
 
@@ -194,50 +215,67 @@ public class AdapterPeers extends RecyclerView.Adapter<AdapterPeers.HolderPeers>
     }
 
     private void removePeer(final String uid, final DialogInterface dialog) {
-        final ProgressDialog progress = new ProgressDialog(context);
-        progress.setMessage("Removing... ");
-        progress.show();
-        progress.setCanceledOnTouchOutside(false);
-        progress.setCancelable(false);
-        final FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-        ref.child(fUser.getUid()).child("Peers").child(uid).removeValue()
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            ref.child(uid).child("Peers").child(fUser.getUid()).removeValue()
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Toast toast = Toast.makeText(context, "Removed successfully", Toast.LENGTH_LONG);
-                                            toast.setGravity(Gravity.CENTER, 0, 0);
-                                            toast.show();
-                                            progress.dismiss();
-                                            dialog.dismiss();
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast toast = Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG);
-                                    toast.setGravity(Gravity.CENTER, 0, 0);
-                                    toast.show();
-                                    progress.dismiss();
-                                    dialog.dismiss();
-                                }
-                            });
-
+        if (!NetworkConnection.isNetworkAvailable(context)){
+            new androidx.appcompat.app.AlertDialog.Builder(context)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("No Internet Connection")
+                    .setMessage("Restore Internet connectivity and try again")
+                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                            }
                         }
-                    }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }else {
+            final ProgressDialog progress = new ProgressDialog(context);
+            progress.setMessage("Removing... ");
+            progress.show();
+            progress.setCanceledOnTouchOutside(false);
+            progress.setCancelable(false);
+            final FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
 
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG).show();
-                progress.dismiss();
-            }
-        });
+            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+            ref.child(fUser.getUid()).child("Peers").child(uid).removeValue()
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                ref.child(uid).child("Peers").child(fUser.getUid()).removeValue()
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Toast toast = Toast.makeText(context, "Removed successfully", Toast.LENGTH_LONG);
+                                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                                toast.show();
+                                                progress.dismiss();
+                                                dialog.dismiss();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast toast = Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG);
+                                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                                toast.show();
+                                                progress.dismiss();
+                                                dialog.dismiss();
+                                            }
+                                        });
+
+                            }
+                        }
+
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG).show();
+                            progress.dismiss();
+                        }
+                    });
+        }
     }
 
     @Override

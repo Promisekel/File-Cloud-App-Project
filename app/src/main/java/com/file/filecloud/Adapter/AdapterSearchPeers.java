@@ -3,7 +3,10 @@ package com.file.filecloud.Adapter;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
+import android.provider.Settings;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +23,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.file.filecloud.Dashboard;
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.ModelClass.ModelPeers;
 import com.file.cloud.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -89,7 +94,24 @@ public class AdapterSearchPeers extends RecyclerView.Adapter<AdapterSearchPeers.
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
-                                connect(uid);
+                                if (!NetworkConnection.isNetworkAvailable(context)){
+                                    new androidx.appcompat.app.AlertDialog.Builder(context)
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .setTitle("No Internet Connection")
+                                            .setMessage("Restore Internet connectivity and try again")
+                                            .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                        context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                    }
+                                                }
+                                            })
+                                            .setNegativeButton("Cancel", null)
+                                            .show();
+                                }else {
+                                    connect(uid);
+                                }
                             }
                         })
                         .setNegativeButton("No", null)
@@ -100,53 +122,71 @@ public class AdapterSearchPeers extends RecyclerView.Adapter<AdapterSearchPeers.
     }
 
     private void connect(final String uid) {
-        final ProgressDialog progress = new ProgressDialog(context);
-        progress.setMessage("Connecting... ");
-        progress.show();
-        progress.setCanceledOnTouchOutside(false);
-        progress.setCancelable(false);
-        final FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
-        final HashMap<Object, String> hashMap = new HashMap<>();
-        hashMap.put("uid", "" + uid);
 
-        final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-        ref.child(fUser.getUid()).child("Peers").child(uid).setValue(hashMap)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            final HashMap<Object, String> hashMap2 = new HashMap<>();
-                            hashMap2.put("uid", "" + fUser.getUid());
-                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-                            ref.child(uid).child("Peers").child(fUser.getUid()).setValue(hashMap2)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Toast toast = Toast.makeText(context, "connected successfully", Toast.LENGTH_LONG);
-                                            toast.setGravity(Gravity.CENTER, 0, 0);
-                                            toast.show();
-                                            progress.dismiss();
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast toast = Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG);
-                                    toast.setGravity(Gravity.CENTER, 0, 0);
-                                    toast.show();
-                                    progress.dismiss();
-                                }
-                            });
-
+        if (!NetworkConnection.isNetworkAvailable(context)){
+            new androidx.appcompat.app.AlertDialog.Builder(context)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("No Internet Connection")
+                    .setMessage("Restore Internet connectivity and try again")
+                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                            }
                         }
-                    }
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        }else {
+            final ProgressDialog progress = new ProgressDialog(context);
+            progress.setMessage("Connecting... ");
+            progress.show();
+            progress.setCanceledOnTouchOutside(false);
+            progress.setCancelable(false);
+            final FirebaseUser fUser = FirebaseAuth.getInstance().getCurrentUser();
+            final HashMap<Object, String> hashMap = new HashMap<>();
+            hashMap.put("uid", "" + uid);
 
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG).show();
-                progress.dismiss();
-            }
-        });
+            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+            ref.child(fUser.getUid()).child("Peers").child(uid).setValue(hashMap)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                final HashMap<Object, String> hashMap2 = new HashMap<>();
+                                hashMap2.put("uid", "" + fUser.getUid());
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+                                ref.child(uid).child("Peers").child(fUser.getUid()).setValue(hashMap2)
+                                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Toast toast = Toast.makeText(context, "connected successfully", Toast.LENGTH_LONG);
+                                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                                toast.show();
+                                                progress.dismiss();
+                                            }
+                                        }).addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast toast = Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG);
+                                                toast.setGravity(Gravity.CENTER, 0, 0);
+                                                toast.show();
+                                                progress.dismiss();
+                                            }
+                                        });
+
+                            }
+                        }
+
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG).show();
+                            progress.dismiss();
+                        }
+                    });
+        }
 
     }
 
@@ -168,7 +208,24 @@ public class AdapterSearchPeers extends RecyclerView.Adapter<AdapterSearchPeers.
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    connect(uid);
+                                    if (!NetworkConnection.isNetworkAvailable(context)){
+                                        new androidx.appcompat.app.AlertDialog.Builder(context)
+                                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                                .setTitle("No Internet Connection")
+                                                .setMessage("Restore Internet connectivity and try again")
+                                                .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                            context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                        }
+                                                    }
+                                                })
+                                                .setNegativeButton("Cancel", null)
+                                                .show();
+                                    }else {
+                                        connect(uid);
+                                    }
                                 }
                             })
                             .setNegativeButton("No", null)
@@ -177,52 +234,68 @@ public class AdapterSearchPeers extends RecyclerView.Adapter<AdapterSearchPeers.
 
                 }
                 if (id == 1) {
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-                    ref.orderByChild("uid").equalTo(uid)
-                            .addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for (DataSnapshot ds: snapshot.getChildren()){
-                                        String fullName = "" + ds.child("fullName").getValue();
-                                        String phone = "" + ds.child("phone").getValue();
-                                        String email = "" + ds.child("email").getValue();
-
-                                        View view = LayoutInflater.from(context).inflate(R.layout.viewpeerdetails, null);
-                                        final TextView name = view.findViewById(R.id.nicki);
-                                        final TextView contact = view.findViewById(R.id.contact);
-                                        final TextView mail = view.findViewById(R.id.mail);
-
-                                        mail.setText(email);
-
-                                        if (fullName.isEmpty()){
-                                            name.setText("Name not Provided Yet");
-                                            name.setTextColor(Color.GRAY);
+                    if (!NetworkConnection.isNetworkAvailable(context)){
+                        new androidx.appcompat.app.AlertDialog.Builder(context)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("No Internet Connection")
+                                .setMessage("Restore Internet connectivity and try again")
+                                .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
                                         }
-                                        else {
-                                            name.setText(fullName);
-                                        }
-                                        if (phone.isEmpty()){
-                                            contact.setText("Contact not Provided Yet");
-                                            contact.setTextColor(Color.GRAY);
-                                        }else{
-                                            contact.setText(phone);
-                                        }
+                                    }
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show();
+                    }else {
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+                        ref.orderByChild("uid").equalTo(uid)
+                                .addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        for (DataSnapshot ds : snapshot.getChildren()) {
+                                            String fullName = "" + ds.child("fullName").getValue();
+                                            String phone = "" + ds.child("phone").getValue();
+                                            String email = "" + ds.child("email").getValue();
 
-                                        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-                                        builder.setView(view);
+                                            View view = LayoutInflater.from(context).inflate(R.layout.viewpeerdetails, null);
+                                            final TextView name = view.findViewById(R.id.nicki);
+                                            final TextView contact = view.findViewById(R.id.contact);
+                                            final TextView mail = view.findViewById(R.id.mail);
 
-                                        final android.app.AlertDialog dialog = builder.create();
-                                        dialog.show();
+                                            mail.setText(email);
+
+                                            if (fullName.isEmpty()) {
+                                                name.setText("Name not Provided Yet");
+                                                name.setTextColor(Color.GRAY);
+                                            } else {
+                                                name.setText(fullName);
+                                            }
+                                            if (phone.isEmpty()) {
+                                                contact.setText("Contact not Provided Yet");
+                                                contact.setTextColor(Color.GRAY);
+                                            } else {
+                                                contact.setText(phone);
+                                            }
+
+                                            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+                                            builder.setView(view);
+
+                                            final android.app.AlertDialog dialog = builder.create();
+                                            dialog.show();
+
+                                        }
 
                                     }
 
-                                }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
+                                    }
+                                });
+                    }
 
                 }
 
