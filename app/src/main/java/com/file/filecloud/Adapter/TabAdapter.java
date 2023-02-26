@@ -15,6 +15,8 @@ public class TabAdapter extends FragmentPagerAdapter {
     private List<String> titleList = new ArrayList<>();
 
 
+    ////LOAD ADAPTER FOR DASHBOAD ACTIVITY
+
     public TabAdapter(@NonNull FragmentManager fm) {
         super(fm);
     }

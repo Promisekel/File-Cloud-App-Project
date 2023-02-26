@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,28 +46,24 @@ public class PhotohAdapter extends RecyclerView.Adapter<PhotohAdapter.HolderPhot
         final String type = model.getType();
 
 
+            //////LOAD PROFILE IMAGE
             try {
                 Picasso.get().load(photo).placeholder(R.drawable.ic_image_icon).into(holder.photoIv);
 
             }catch (Exception e){
-
+                Toast.makeText(context, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
             }
 
-
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, viewMyPhoto.class);
-                intent.putExtra("myUid", uid);
-                intent.putExtra("timestamp", timestamp);
-                intent.putExtra("fileName", fileName);
-                intent.putExtra("fileUri", photo);
-                intent.putExtra("type", type);
-                context.startActivity(intent);
-            }
+            ////VIEW PROFILE IMAGE
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, viewMyPhoto.class);
+            intent.putExtra("myUid", uid);
+            intent.putExtra("timestamp", timestamp);
+            intent.putExtra("fileName", fileName);
+            intent.putExtra("fileUri", photo);
+            intent.putExtra("type", type);
+            context.startActivity(intent);
         });
-
-
     }
 
 

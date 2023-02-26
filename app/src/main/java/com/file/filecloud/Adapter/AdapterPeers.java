@@ -68,26 +68,18 @@ public class AdapterPeers extends RecyclerView.Adapter<AdapterPeers.HolderPeers>
         final ModelPeers model = modelPeers.get(position);
         final String fullName = model.getFullName();
         final String uid = model.getUid();
-        final String avatar = model.getImage();
 
 
-        holder.moreBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openMenuOptions(uid,holder.moreBtn,fullName);
-            }
+        holder.moreBtn.setOnClickListener(v -> openMenuOptions(uid,holder.moreBtn,fullName));
+
+        holder.avatarIv.setOnClickListener(v -> {
+            Intent intent = new Intent(context, viewpeerphoto.class);
+            intent.putExtra("myUid", uid);
+            context.startActivity(intent);
+
         });
 
-        holder.avatarIv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, viewpeerphoto.class);
-                intent.putExtra("myUid", uid);
-                context.startActivity(intent);
-
-            }
-        });
-
+        ////GET FULL NAME AND PROFILE IMAGE FROM DB
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
         reference.orderByChild("uid").equalTo(uid).addValueEventListener(new ValueEventListener() {
             @Override
@@ -116,7 +108,7 @@ public class AdapterPeers extends RecyclerView.Adapter<AdapterPeers.HolderPeers>
         });
 
     }
-
+    ////OPEN MENU OPTIONS
     private void openMenuOptions(final String uid, ImageButton morebtn, String nicki) {
         final PopupMenu popupMenu = new PopupMenu(context, morebtn, Gravity.END);
         popupMenu.getMenu().add(Menu.NONE, 0, 1, "View contact");
@@ -213,7 +205,7 @@ public class AdapterPeers extends RecyclerView.Adapter<AdapterPeers.HolderPeers>
         });
         popupMenu.show();
     }
-
+    ////REMOVE PEER FROM YOUR PEER LIST IN DB
     private void removePeer(final String uid, final DialogInterface dialog) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)
@@ -283,7 +275,7 @@ public class AdapterPeers extends RecyclerView.Adapter<AdapterPeers.HolderPeers>
         return modelPeers.size();
     }
 
-
+        ////INITIATE IDs
     public static class HolderPeers extends RecyclerView.ViewHolder{
 
         private ImageView avatarIv;

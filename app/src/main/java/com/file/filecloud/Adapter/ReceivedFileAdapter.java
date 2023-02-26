@@ -375,7 +375,7 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
         });
 
     }*/
-
+        ////OPEN RENAME RECEIVED FILE DIALOG
     private void openRenameDialog(final String timestamp, final String type, final String fileName, final String uid, ImageButton moreBtn) {
         final PopupMenu popupMenu = new PopupMenu(context, moreBtn, Gravity.END);
         popupMenu.getMenu().add(Menu.NONE, 0, 0, "Edit File name");
@@ -524,6 +524,8 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
 
     }
 
+
+        ///DOWNLOAD RECEIVED FILES DB
     private void startDownload(final String fileUri, final String fileName, String uid, String timestamp, final String type) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)
@@ -584,6 +586,7 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
 
     }
 
+        ////DELETE RECEIVED FILE FROM DB
     private void  begindelete(final String uid, final String timestamp, final String fileName, final String fileUri, final String type) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)
@@ -678,6 +681,7 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
         }
     }
 
+    /////SHARE RECEIVED FILE WITH PEER
     private void shareFile(Context context, String uid, String timestamp, String fileName, String fileUri, String type) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)
@@ -702,31 +706,6 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
         intent.putExtra("fileUri", fileUri);
         intent.putExtra("type", type);
         context.startActivity(intent);}
-
-    }
-    private void openDropDown(final UserTrashModel model, ImageButton dropDown) {
-        final PopupMenu popupMenu = new PopupMenu(context, dropDown, Gravity.END);
-        popupMenu.getMenu().add(Menu.NONE, 0, 0, "File Details");
-
-            if (model.getType().equals("PHOTO")){
-                popupMenu.getMenu().add(Menu.NONE, 1, 0, "View in Grid");
-            }
-
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                if (id == 0) {
-                    Toast.makeText(context, "file details", Toast.LENGTH_SHORT).show();
-                }
-                if (id == 1) {
-                    Toast.makeText(context, "View in Grid", Toast.LENGTH_SHORT).show();
-                }
-
-                return false;
-            }
-        });
-        popupMenu.show();
 
     }
 

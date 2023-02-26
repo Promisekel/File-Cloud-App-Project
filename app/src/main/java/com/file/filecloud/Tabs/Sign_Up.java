@@ -5,8 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +18,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.file.filecloud.Dashboard;
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.LoginActivity;
 import com.file.cloud.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -81,7 +86,23 @@ public class Sign_Up extends AppCompatActivity {
 
                 }
                 else {
-                    RegisterUser( Email, Password );
+                    if (!NetworkConnection.isNetworkAvailable(Sign_Up.this)){
+                        new androidx.appcompat.app.AlertDialog.Builder(Sign_Up.this)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("No Internet Connection")
+                                .setMessage("Restore Internet connectivity and try again")
+                                .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show();
+                    }else {
+                    RegisterUser( Email, Password );}
                 }
 
             }

@@ -11,9 +11,8 @@ public class DataPersistance extends Application {
     public void onCreate() {
         super.onCreate();
 
+        ////CREATE CACHE DATA
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
-
     }
 
 }

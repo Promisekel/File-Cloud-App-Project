@@ -473,7 +473,7 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
 
     }
 
-
+    ////SHARE FILE WITH PEER
     private void shareFile(String uid, String timestamp, String fileName, String fileUri, String type) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)
@@ -500,7 +500,7 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
         context.startActivity(intent);}
     }
 
-
+    ///RENAME FILE DIALOG
     private void openRenameDialog(final String timestamp, final String type, final String fileName, final String uid, ImageButton moreBtn) {
         final PopupMenu popupMenu = new PopupMenu(context, moreBtn, Gravity.END);
         popupMenu.getMenu().add(Menu.NONE, 0, 0, "Edit File name");
@@ -602,7 +602,7 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
 
 
     }
-
+    ////DOWNLOAD FILE FROM DB
     private void startDownload(final String fileUri, final String fileName, String uid, String timestamp, final String type) {
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReference("Users").child(uid).child("Files");
         Query query = dbRef.orderByChild("timestamp").equalTo(timestamp);
@@ -665,7 +665,7 @@ public class FileTapAdapter extends RecyclerView.Adapter<FileTapAdapter.HolderPD
         });
 
     }
-
+    ////DELETE FILE FROM DB
     private void begidelete(final String uid, final String timestamp, final String fileName, final String fileUri, final String type) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)

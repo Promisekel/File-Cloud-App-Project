@@ -4,11 +4,14 @@ import android.R.color;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -37,6 +40,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.file.filecloud.Dashboard;
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.ModelClass.ModelPeers;
 import com.file.cloud.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -62,7 +67,7 @@ shareListActivity extends AppCompatActivity {
     private FirebaseUser user;
     private Toolbar toolbar;
     private TextView displayTv;
-    private String uid, timestamp, fileName, fileUri, type;
+    private String fuser, timestamp, fileName, fileUri, type, uid;
     private RecyclerView peersRv;
     private AdapterShare adapterShare;
     private RelativeLayout placeholder;
@@ -75,7 +80,7 @@ shareListActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
-        uid = auth.getUid();
+        fuser = auth.getUid();
 
         Intent intent = getIntent();
         timestamp = "" + intent.getStringExtra("timestamp");
@@ -105,7 +110,7 @@ shareListActivity extends AppCompatActivity {
     private void loadPeers() {
         modelPeer = new ArrayList<>();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-        ref.child(user.getUid()).child("Peers")
+        ref.child(fuser).child("Peers")
                 .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -309,7 +314,6 @@ shareListActivity extends AppCompatActivity {
         });
     }
 
-
     /*private void updateUserName(final String fname, final String sname, final android.app.AlertDialog dialog, final android.app.AlertDialog alertDialog) {
         final ProgressDialog progress = new ProgressDialog(shareListActivity.this);
         progress.setMessage("updating name please wait...");
@@ -425,6 +429,8 @@ public class AdapterShare extends RecyclerView.Adapter<AdapterShare.ViewHolder> 
         final String uid = model.getUid();
         final String firstName = model.getFirstName();
         final String surName = model.getSurName();
+        final String fullName = model.getSurName();
+
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("Users");
         reference.orderByChild("uid").equalTo(uid).addValueEventListener(new ValueEventListener() {
@@ -459,7 +465,23 @@ public class AdapterShare extends RecyclerView.Adapter<AdapterShare.ViewHolder> 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                shareFile(model);
+                if (!NetworkConnection.isNetworkAvailable(shareListActivity.this)){
+                    new androidx.appcompat.app.AlertDialog.Builder(shareListActivity.this)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("No Internet Connection")
+                            .setMessage("Restore Internet connectivity and try again")
+                            .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                    }
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }else {
+                shareFile(model);}
             }
         });
     }
@@ -503,6 +525,8 @@ public class AdapterShare extends RecyclerView.Adapter<AdapterShare.ViewHolder> 
             public void onClick(View v) {
                 VerifyBtn.setVisibility(View.GONE);
                 progress.setVisibility(View.VISIBLE);
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.setCancelable(false);
                 final String timestamp = String.valueOf(System.currentTimeMillis());
                 final HashMap<Object, String> hashMap = new HashMap<>();
                 hashMap.put("sender", user.getUid());

@@ -54,19 +54,16 @@ public class RecievedPhotoAdapter extends RecyclerView.Adapter<RecievedPhotoAdap
         }
 
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, viewRecievedPhoto.class);
-                intent.putExtra("myUid", uid);
-                intent.putExtra("timestamp", timestamp);
-                intent.putExtra("fileName", fileName);
-                intent.putExtra("fileUri", photo);
-                intent.putExtra("type", type);
-                context.startActivity(intent);
-            }
+        ////VIEW RECEIVED PICTURES
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, viewRecievedPhoto.class);
+            intent.putExtra("myUid", uid);
+            intent.putExtra("timestamp", timestamp);
+            intent.putExtra("fileName", fileName);
+            intent.putExtra("fileUri", photo);
+            intent.putExtra("type", type);
+            context.startActivity(intent);
         });
-
 
     }
 
@@ -75,8 +72,6 @@ public class RecievedPhotoAdapter extends RecyclerView.Adapter<RecievedPhotoAdap
     public int getItemCount() {
         return filesModel.size();
     }
-
-
 
     public static class HolderPhoto extends RecyclerView.ViewHolder {
 

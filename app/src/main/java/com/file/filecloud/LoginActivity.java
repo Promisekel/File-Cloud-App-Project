@@ -7,7 +7,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -20,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.Tabs.Sign_Up;
 import com.file.cloud.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -76,7 +79,23 @@ public class LoginActivity extends AppCompatActivity {
                     memailEt.setFocusable(true);
                 }
                 else{
-                    LoginUser(Email, Password);
+                    if (!NetworkConnection.isNetworkAvailable(LoginActivity.this)){
+                        new androidx.appcompat.app.AlertDialog.Builder(LoginActivity.this)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("No Internet Connection")
+                                .setMessage("Restore Internet connectivity and try again")
+                                .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show();
+                    }else {
+                    LoginUser(Email, Password);}
                 }
             }
         });
