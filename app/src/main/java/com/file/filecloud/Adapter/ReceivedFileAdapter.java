@@ -111,17 +111,13 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
             case "PDF":
                 holder.avatarIv.setImageResource(R.drawable.ic_pdf_icon);
 
-                holder.download.setOnClickListener(new View.OnClickListener() {
-                    @SuppressLint("WrongConstant")
-                    @Override
-                    public void onClick(View v) {
+                holder.download.setOnClickListener(v -> {
 
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            requestPermissions((AppCompatActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
-                        } else {
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions((AppCompatActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+                    } else {
 
-                                startDownload(fileUri, fileName, uid, timestamp, type);
-                        }
+                            startDownload(fileUri, fileName, uid, timestamp, type);
                     }
                 });
 
@@ -183,25 +179,18 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
                 holder.avatarIv.setImageResource(R.drawable.ic_excel_icon);
 
 
-                holder.preview.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(context, PreviewRecievedFile.class);
-                        intent.putExtra("timestamp", timestamp);
-                        intent.putExtra("fileUri", fileUri);
-                        intent.putExtra("fileName", fileName);
-                        context.startActivity(intent);
-                    }
+                holder.preview.setOnClickListener(v -> {
+                    Intent intent = new Intent(context, PreviewRecievedFile.class);
+                    intent.putExtra("timestamp", timestamp);
+                    intent.putExtra("fileUri", fileUri);
+                    intent.putExtra("fileName", fileName);
+                    context.startActivity(intent);
                 });
-                holder.download.setOnClickListener(new View.OnClickListener() {
-                    @SuppressLint("WrongConstant")
-                    @Override
-                    public void onClick(View v) {
-                        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                            requestPermissions((AppCompatActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
-                        } else {
-                            startDownload(fileUri, fileName, uid, timestamp, type);
-                        }
+                holder.download.setOnClickListener(v -> {
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions((AppCompatActivity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+                    } else {
+                        startDownload(fileUri, fileName, uid, timestamp, type);
                     }
                 });
 
@@ -375,148 +364,145 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
         });
 
     }*/
-
+        ////OPEN RENAME RECEIVED FILE DIALOG
     private void openRenameDialog(final String timestamp, final String type, final String fileName, final String uid, ImageButton moreBtn) {
         final PopupMenu popupMenu = new PopupMenu(context, moreBtn, Gravity.END);
         popupMenu.getMenu().add(Menu.NONE, 0, 0, "Edit File name");
         popupMenu.getMenu().add(Menu.NONE, 1, 1, "View Details");
 
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
+        popupMenu.setOnMenuItemClickListener(item -> {
+            int id = item.getItemId();
 
-                if (id == 0) {
-                    View view = LayoutInflater.from(context).inflate(R.layout.edit_file_name, null);
-                    final Button uploadBtn = view.findViewById(R.id.uploadBtn);
-                    final EditText fileNamEt = view.findViewById(R.id.fileNamEt);
+            if (id == 0) {
+                View view = LayoutInflater.from(context).inflate(R.layout.edit_file_name, null);
+                final Button uploadBtn = view.findViewById(R.id.uploadBtn);
+                final EditText fileNamEt = view.findViewById(R.id.fileNamEt);
 
-                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-                    builder.setView(view);
+                android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+                builder.setView(view);
 
-                    final android.app.AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
+                final android.app.AlertDialog alertDialog = builder.create();
+                alertDialog.show();
 
-                    fileNamEt.setText(fileName);
-                    fileNamEt.setInputType(InputType.TYPE_CLASS_TEXT);
+                fileNamEt.setText(fileName);
+                fileNamEt.setInputType(InputType.TYPE_CLASS_TEXT);
 
-                    uploadBtn.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                                if (!TextUtils.isEmpty(fileName))
+                uploadBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                            if (!TextUtils.isEmpty(fileName))
 
-                                {
-                                    String fileName = fileNamEt.getText().toString().trim();
+                            {
+                                String fileName1 = fileNamEt.getText().toString().trim();
 
-                                    switch (type) {
-                                        case "DOC":
-                                        case "PDF":
-                                        case "PPT":
-                                        case "AUDIO":
-                                        case "VIDEO":
-                                        case "EXCEL":
-                                            sendFile(timestamp, fileName);
-                                            break;
-                                    }
+                                switch (type) {
+                                    case "DOC":
+                                    case "PDF":
+                                    case "PPT":
+                                    case "AUDIO":
+                                    case "VIDEO":
+                                    case "EXCEL":
+                                        sendFile(timestamp, fileName1);
+                                        break;
                                 }
-                                else{
-                                    Toast.makeText(context, "Please Enter a file name", Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                Toast.makeText(context, "Please Enter a file name", Toast.LENGTH_SHORT).show();
 
-                                }
+                            }
 
-                        }
+                    }
 
-                        private void sendFile(String timestamp, String fileName) {
-                            if (!NetworkConnection.isNetworkAvailable(context)){
-                                new androidx.appcompat.app.AlertDialog.Builder(context)
-                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                        .setTitle("No Internet Connection")
-                                        .setMessage("Restore Internet connectivity and try again")
-                                        .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                                    context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
-                                                }
-                                            }
-                                        })
-                                        .setNegativeButton("Cancel", null)
-                                        .show();
-                            }else {
-                            final ProgressDialog progress= new ProgressDialog(context);
-                            progress.setMessage("Updating file name...");
-                            progress.show();
-                            progress.setCanceledOnTouchOutside(false);
-                            progress.setCancelable(false);
-                            HashMap<String, Object> hashMap = new HashMap<>();
-                            hashMap.put("fileName", fileName);
-                            FirebaseAuth auth = FirebaseAuth.getInstance();
-                            FirebaseUser user=auth.getCurrentUser();
-                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-                            ref.child(user.getUid()).child("Received Files").child(timestamp).updateChildren(hashMap)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    private void sendFile(String timestamp1, String fileName1) {
+                        if (!NetworkConnection.isNetworkAvailable(context)){
+                            new AlertDialog.Builder(context)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .setTitle("No Internet Connection")
+                                    .setMessage("Restore Internet connectivity and try again")
+                                    .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
                                         @Override
-                                        public void onSuccess(Void aVoid) {
-                                            progress.dismiss();
-                                            alertDialog.dismiss();
-                                            Toast.makeText(context,"File name updated successfully", Toast.LENGTH_LONG).show();
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                context.startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                            }
                                         }
                                     })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            progress.dismiss();
-                                            alertDialog.dismiss();
-                                            Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG).show();
-
-                                        }
-                                    });}
-                        }
-                    });
-
-                }
-                if (id == 1){
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
-                    ref.orderByChild("uid").equalTo(uid)
-                            .addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for (DataSnapshot ds: snapshot.getChildren()){
-                                        String nicki = "" + ds.child("nicki").getValue();
-
-                                        View view = LayoutInflater.from(context).inflate(R.layout.file_detail_layout, null);
-                                        final TextView file = view.findViewById(R.id.fileName);
-                                        final TextView dateSent = view.findViewById(R.id.timestamp);
-                                        final TextView sender = view.findViewById(R.id.sender);
-
-                                        file.setText(fileName);
-                                        sender.setText(nicki);
-
-                                        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-                                        calendar.setTimeInMillis(Long.parseLong(timestamp));
-                                        final String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
-
-                                        dateSent.setText(dateTime);
-
-
-                                        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
-                                        builder.setView(view);
-
-                                        final android.app.AlertDialog dialog = builder.create();
-                                        dialog.show();
+                                    .setNegativeButton("Cancel", null)
+                                    .show();
+                        }else {
+                        final ProgressDialog progress= new ProgressDialog(context);
+                        progress.setMessage("Updating file name...");
+                        progress.show();
+                        progress.setCanceledOnTouchOutside(false);
+                        progress.setCancelable(false);
+                        HashMap<String, Object> hashMap = new HashMap<>();
+                        hashMap.put("fileName", fileName1);
+                        FirebaseAuth auth = FirebaseAuth.getInstance();
+                        FirebaseUser user=auth.getCurrentUser();
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+                        ref.child(user.getUid()).child("Received Files").child(timestamp1).updateChildren(hashMap)
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        progress.dismiss();
+                                        alertDialog.dismiss();
+                                        Toast.makeText(context,"File name updated successfully", Toast.LENGTH_LONG).show();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        progress.dismiss();
+                                        alertDialog.dismiss();
+                                        Toast.makeText(context, "" + e.getMessage(), Toast.LENGTH_LONG).show();
 
                                     }
+                                });}
+                    }
+                });
 
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
-                }
-                return false;
             }
+            if (id == 1){
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference("Users");
+                ref.orderByChild("uid").equalTo(uid)
+                        .addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for (DataSnapshot ds: snapshot.getChildren()){
+                                    String fullName = "" + ds.child("fullName").getValue();
+
+                                    View view = LayoutInflater.from(context).inflate(R.layout.file_detail_layout, null);
+                                    final TextView file = view.findViewById(R.id.fileName);
+                                    final TextView dateSent = view.findViewById(R.id.timestamp);
+                                    final TextView sender = view.findViewById(R.id.sender);
+
+                                    file.setText(fileName);
+                                    sender.setText(fullName);
+
+                                    Calendar calendar = Calendar.getInstance(Locale.getDefault());
+                                    calendar.setTimeInMillis(Long.parseLong(timestamp));
+                                    final String dateTime = DateFormat.format("dd/MM/yyyy hh:mm aa", calendar).toString();
+
+                                    dateSent.setText(dateTime);
+
+
+                                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(context);
+                                    builder.setView(view);
+
+                                    final android.app.AlertDialog dialog = builder.create();
+                                    dialog.show();
+
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+            }
+            return false;
         });
         popupMenu.show();
 
@@ -524,6 +510,8 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
 
     }
 
+
+        ///DOWNLOAD RECEIVED FILES DB
     private void startDownload(final String fileUri, final String fileName, String uid, String timestamp, final String type) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)
@@ -584,6 +572,7 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
 
     }
 
+        ////DELETE RECEIVED FILE FROM DB
     private void  begindelete(final String uid, final String timestamp, final String fileName, final String fileUri, final String type) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)
@@ -678,6 +667,7 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
         }
     }
 
+    /////SHARE RECEIVED FILE WITH PEER
     private void shareFile(Context context, String uid, String timestamp, String fileName, String fileUri, String type) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)
@@ -702,31 +692,6 @@ public class ReceivedFileAdapter extends RecyclerView.Adapter<ReceivedFileAdapte
         intent.putExtra("fileUri", fileUri);
         intent.putExtra("type", type);
         context.startActivity(intent);}
-
-    }
-    private void openDropDown(final UserTrashModel model, ImageButton dropDown) {
-        final PopupMenu popupMenu = new PopupMenu(context, dropDown, Gravity.END);
-        popupMenu.getMenu().add(Menu.NONE, 0, 0, "File Details");
-
-            if (model.getType().equals("PHOTO")){
-                popupMenu.getMenu().add(Menu.NONE, 1, 0, "View in Grid");
-            }
-
-        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                if (id == 0) {
-                    Toast.makeText(context, "file details", Toast.LENGTH_SHORT).show();
-                }
-                if (id == 1) {
-                    Toast.makeText(context, "View in Grid", Toast.LENGTH_SHORT).show();
-                }
-
-                return false;
-            }
-        });
-        popupMenu.show();
 
     }
 

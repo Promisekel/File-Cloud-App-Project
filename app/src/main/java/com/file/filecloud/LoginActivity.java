@@ -7,7 +7,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -20,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.Tabs.Sign_Up;
 import com.file.cloud.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -34,7 +37,6 @@ public class LoginActivity extends AppCompatActivity {
    private Button mLoginBtn;
    private TextView memailEt, mpasswordEt, resetTv;
 
-   private ProgressDialog progressDialog;
    private Button signIn;
 
     private FirebaseAuth auth;
@@ -66,35 +68,43 @@ public class LoginActivity extends AppCompatActivity {
         mprogressDialog.setMessage("Logging In Please Wait...");
         mprogressDialog.setCanceledOnTouchOutside(false);
 
-        mLoginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String Email =memailEt.getText().toString();
-                String Password = mpasswordEt.getText().toString().trim();
-                if (!Patterns.EMAIL_ADDRESS.matcher(Email).matches()){
-                    memailEt.setError("Invalid Email");
-                    memailEt.setFocusable(true);
-                }
-                else{
-                    LoginUser(Email, Password);
-                }
+        mLoginBtn.setOnClickListener(v -> {
+            String Email =memailEt.getText().toString();
+            String Password = mpasswordEt.getText().toString().trim();
+            if (!Patterns.EMAIL_ADDRESS.matcher(Email).matches()){
+                memailEt.setError("Invalid Email");
+                memailEt.setFocusable(true);
+            } else if (Password.isEmpty() || Password.length()<6) {
+                mpasswordEt.setError("Password Cannot be empty and must be at least 6 characters");
+                mpasswordEt.setFocusable(true);
+
+            } else{
+                if (!NetworkConnection.isNetworkAvailable(LoginActivity.this)){
+                    new androidx.appcompat.app.AlertDialog.Builder(LoginActivity.this)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("No Internet Connection")
+                            .setMessage("Restore Internet connectivity and try again")
+                            .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                    }
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }else {
+                LoginUser(Email, Password);}
             }
         });
 
-        signIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this,Sign_Up.class));
-                finish();
-            }
+        signIn.setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this,Sign_Up.class));
+            finish();
         });
 
-        resetTv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PasswordRecover();
-            }
-        });
+        resetTv.setOnClickListener(v -> PasswordRecover());
 
 
 
@@ -104,6 +114,7 @@ public class LoginActivity extends AppCompatActivity {
     private void LoginUser(String email, String password) {
         mprogressDialog.setMessage("Logging in Please Wait...");
         mprogressDialog.show();
+        mprogressDialog.setCanceledOnTouchOutside(false);
 
         auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {

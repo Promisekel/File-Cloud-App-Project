@@ -45,10 +45,6 @@
         <activity
             android:name="com.file.filecloud.PreviewFile"
             android:theme="@style/AppTheme.CustomTheme" />
-
-        <activity
-            android:name="com.file.filecloud.UploadFile"
-            android:theme="@style/AppTheme.CustomTheme" />
         <activity
             android:name="com.file.filecloud.ProfileActivity"
             android:theme="@style/AppTheme.CustomTheme" />

@@ -284,6 +284,16 @@ public class Dashboard extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        boolean isScreenOn = pm.isInteractive();
+        if (!isScreenOn) {
+            startActivity(new Intent(Dashboard.this, PinVerification.class));
+        }
+    }
+
     public void choosePhoto(final View view) {
         Dexter.withContext(getApplicationContext())
                 .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)

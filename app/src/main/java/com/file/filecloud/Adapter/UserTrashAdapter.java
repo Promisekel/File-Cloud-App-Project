@@ -547,6 +547,8 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
         });
     }
 
+
+    ////DELETE FILE PERMANENTLY FROM DB
     private void deletePermanently(String deleteTimestamp, String uid) {
         if (!NetworkConnection.isNetworkAvailable(context)){
             new androidx.appcompat.app.AlertDialog.Builder(context)
@@ -600,6 +602,7 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
 
     }
 
+    ///RESTORE DELETED FILES FROM DB
     private void restore(final String timestamp, final String uid, final String type, final String deleteTimestamp, final String fileName, final String fileUri, String DeleteTypeReceived) {
         final ProgressDialog progress = new ProgressDialog(context);progress.setMessage("Restoring...");
             progress.setCancelable(false);
@@ -727,6 +730,7 @@ public class UserTrashAdapter extends RecyclerView.Adapter<UserTrashAdapter.Hold
             }
     }
 
+    /////OPEN DROP DOWN FOR FILE DETAILS
     private void openDropDown(final UserTrashModel model, ImageButton dropDown, final String timestamp, final String fileName, final String deleteTimestamp) {
         final PopupMenu popupMenu = new PopupMenu(context, dropDown, Gravity.END);
         popupMenu.getMenu().add(Menu.NONE, 0, 0, "File Details");

@@ -10,8 +10,10 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -29,6 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.Tabs.viewprofilephoto;
 import com.file.cloud.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -209,7 +212,23 @@ public class ProfileActivity extends AppCompatActivity {
                 final String sname = surName.getText().toString().trim();
                 if (!TextUtils.isEmpty(fname)) {
                         if (!TextUtils.isEmpty(sname)){
-                            updateUserName(fname, sname,alertDialog);
+                            if (!NetworkConnection.isNetworkAvailable(ProfileActivity.this)){
+                                new androidx.appcompat.app.AlertDialog.Builder(ProfileActivity.this)
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .setTitle("No Internet Connection")
+                                        .setMessage("Restore Internet connectivity and try again")
+                                        .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                                    startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", null)
+                                        .show();
+                            }else {
+                            updateUserName(fname, sname,alertDialog);}
                         }else {
                             surName.setHint("Provide your surname");
                             surName.setHintTextColor(Color.parseColor("#880808"));
@@ -316,7 +335,23 @@ public class ProfileActivity extends AppCompatActivity {
                         progress.show();
                         progress.setCanceledOnTouchOutside(false);
                         progress.setCancelable(false);
-                        uploadKey(key, value, progress, dialog);
+                    if (!NetworkConnection.isNetworkAvailable(ProfileActivity.this)){
+                        new androidx.appcompat.app.AlertDialog.Builder(ProfileActivity.this)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("No Internet Connection")
+                                .setMessage("Restore Internet connectivity and try again")
+                                .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show();
+                    }else {
+                        uploadKey(key, value, progress, dialog);}
 
                 } else {
                     Toast.makeText(ProfileActivity.this, "Please Enter " + key, Toast.LENGTH_SHORT).show();
@@ -384,8 +419,24 @@ public class ProfileActivity extends AppCompatActivity {
                         progress.show();
 
                         Uri resultUri = result.getUri();
+                    if (!NetworkConnection.isNetworkAvailable(ProfileActivity.this)){
+                        new androidx.appcompat.app.AlertDialog.Builder(ProfileActivity.this)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle("No Internet Connection")
+                                .setMessage("Restore Internet connectivity and try again")
+                                .setPositiveButton("Setup", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                            startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                        }
+                                    }
+                                })
+                                .setNegativeButton("Cancel", null)
+                                .show();
+                    }else {
 
-                        uploadProfilePhoto(resultUri);
+                        uploadProfilePhoto(resultUri);}
 
                 }
 

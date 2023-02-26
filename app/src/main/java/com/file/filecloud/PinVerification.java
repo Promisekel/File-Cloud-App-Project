@@ -682,12 +682,16 @@ public class PinVerification extends AppCompatActivity implements View.OnClickLi
                     String passcode = "" + ds.child("passcode").getValue();
                     String pincode = "" + ds.child("pincode").getValue();
 
-                    if (pincode != null) {
-                        if (pincode.isEmpty()) {
+                    if (pincode.isEmpty()) {
                             verifyInfoDialog();
-                        }
+
                     } else {
-                        verifyInfoDialog();
+                        SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.remove("passcode");
+                        editor.apply();
+                        editor.putString("passcode", pincode);
+                        editor.apply();
                     }
                 }
 

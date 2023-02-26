@@ -5,8 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +20,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.file.filecloud.Dashboard;
+import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.LoginActivity;
 import com.file.cloud.R;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -34,9 +41,6 @@ public class Sign_Up extends AppCompatActivity {
 
     private FirebaseAuth auth;
     FirebaseUser user;
-    private static final int RC_SIGN_IN = 100;
-    private GoogleSignInClient mGoogleSignInClient;
-    private SignInButton GLogin;
 
     private Button RegisterBtn;
     private TextView mEmailEt, mPasswordEt;
@@ -52,7 +56,6 @@ public class Sign_Up extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         user =auth.getCurrentUser();
 
-        //checkConnection();
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -62,37 +65,43 @@ public class Sign_Up extends AppCompatActivity {
         RegisterBtn = findViewById(R.id.RegisterBtn);
         mHaveAccount = findViewById(R.id.have_accountTv);
 
+        RegisterBtn.setOnClickListener(v -> {
 
-        RegisterBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            String Email = mEmailEt.getText().toString().trim();
+            String Password = mPasswordEt.getText().toString().trim();
 
-                String Email = mEmailEt.getText().toString().trim();
-                String Password = mPasswordEt.getText().toString().trim();
-
-                if(!Patterns.EMAIL_ADDRESS.matcher(Email).matches()){
-                    mEmailEt.setError("Invalid Email");
-                    mEmailEt.setFocusable(true);
-
-                }
-                else if (Password.length()<6){
-                    mPasswordEt.setError("Password must be at least 6 characters ");
-                    mPasswordEt.setFocusable(true);
-
-                }
-                else {
-                    RegisterUser( Email, Password );
-                }
+            if(!Patterns.EMAIL_ADDRESS.matcher(Email).matches()){
+                mEmailEt.setError("Invalid Email");
+                mEmailEt.setFocusable(true);
 
             }
+            else if (Password.isEmpty() || Password.length()<6){
+                mPasswordEt.setError("Password Cannot be empty and must be more than 6 characters");
+                mPasswordEt.setFocusable(true);
+
+            }
+            else {
+                if (!NetworkConnection.isNetworkAvailable(Sign_Up.this)){
+                    new androidx.appcompat.app.AlertDialog.Builder(Sign_Up.this)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setTitle("No Internet Connection")
+                            .setMessage("Restore Internet connectivity and try again")
+                            .setPositiveButton("Setup", (dialog, which) -> {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                    startActivity(new Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY));
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }else {
+                RegisterUser( Email, Password );}
+            }
+
         });
 
-        mHaveAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Sign_Up.this,LoginActivity .class));
-                finish();
-            }
+        mHaveAccount.setOnClickListener(v -> {
+            startActivity(new Intent(Sign_Up.this,LoginActivity .class));
+            finish();
         });
 
 
@@ -104,62 +113,52 @@ public class Sign_Up extends AppCompatActivity {
         progressDialog.setMessage("Registering Please Wait....");
         progressDialog.show();
         auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            progressDialog.dismiss();
-                            FirebaseUser user = auth.getCurrentUser();
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        progressDialog.dismiss();
+                        FirebaseUser user = auth.getCurrentUser();
 
-                            final String email = user.getEmail();
-                            final String uid = user.getUid();
+                        final String email1 = user.getEmail();
+                        final String uid = user.getUid();
 
-                            HashMap<Object, String> hashMap = new HashMap<>();
-                            hashMap.put("email", email);
-                            hashMap.put("uid", uid);
-                            hashMap.put("firstName", "");
-                            hashMap.put("surName", "");
-                            hashMap.put("fullName", "");
-                            hashMap.put("image", "");
-                            hashMap.put("phone", "");
-                            hashMap.put("passcode", "");
-                            hashMap.put("pincode", "");
+                        HashMap<Object, String> hashMap = new HashMap<>();
+                        hashMap.put("email", email1);
+                        hashMap.put("uid", uid);
+                        hashMap.put("firstName", "");
+                        hashMap.put("surName", "");
+                        hashMap.put("fullName", "");
+                        hashMap.put("image", "");
+                        hashMap.put("phone", "");
+                        hashMap.put("passcode", "");
+                        hashMap.put("pincode", "");
 
-                            FirebaseDatabase database = FirebaseDatabase.getInstance();
-                            DatabaseReference reference = database.getReference("Users");
-                            reference.child(uid).setValue(hashMap);
-                            auth.getCurrentUser().sendEmailVerification()
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()){
-                                                verifyInfoDialog();
-                                            }
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference reference = database.getReference("Users");
+                        reference.child(uid).setValue(hashMap);
+                        auth.getCurrentUser().sendEmailVerification()
+                                .addOnCompleteListener(task1 -> {
+                                    if (task1.isSuccessful()){
+                                        SharedPreferences preferences = getSharedPreferences("passcode.pref", Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = preferences.edit();
+                                        editor.remove("passcode");
+                                        editor.apply();
+                                        verifyInfoDialog();
+                                    }
 
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(Sign_Up.this, ""+e.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-                            });
+                                }).addOnFailureListener(e -> Toast.makeText(Sign_Up.this, ""+e.getMessage(), Toast.LENGTH_LONG).show());
 
 
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            progressDialog.dismiss();
-                            Toast.makeText(Sign_Up.this, "Authentication failed.", Toast.LENGTH_LONG).show();
-                        }
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        progressDialog.dismiss();
+                        Toast.makeText(Sign_Up.this, "Authentication failed.", Toast.LENGTH_LONG).show();
                     }
-                }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                progressDialog.dismiss();
-                Toast.makeText(Sign_Up.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
+                }).addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    Toast.makeText(Sign_Up.this, "" + e.getMessage(), Toast.LENGTH_LONG).show();
 
-            }
-        });
+                });
 
     }
 
@@ -199,13 +198,10 @@ public class Sign_Up extends AppCompatActivity {
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
-        msgeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(Sign_Up.this, LoginActivity.class));
-                dialog.dismiss();
-                finish();
-            }
+        msgeBtn.setOnClickListener(v -> {
+            startActivity(new Intent(Sign_Up.this, LoginActivity.class));
+            dialog.dismiss();
+            finish();
         });
     }
 
@@ -221,7 +217,5 @@ public class Sign_Up extends AppCompatActivity {
         finish();
         return super.onSupportNavigateUp();
     }
-
-
 
 }

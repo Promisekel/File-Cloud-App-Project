@@ -121,6 +121,7 @@ public class AdapterSearchPeers extends RecyclerView.Adapter<AdapterSearchPeers.
 
     }
 
+    ///ADD PEER TO PEER LIST IN DB
     private void connect(final String uid) {
 
         if (!NetworkConnection.isNetworkAvailable(context)){
@@ -189,7 +190,7 @@ public class AdapterSearchPeers extends RecyclerView.Adapter<AdapterSearchPeers.
         }
 
     }
-
+    ///OPEN MENU OPTIONS
     private void openMenuOptions(final String uid, ImageButton morebtn, String nicki) {
         final PopupMenu popupMenu = new PopupMenu(context, morebtn, Gravity.END);
         popupMenu.getMenu().add(Menu.NONE, 0, 1, "Connect");
@@ -310,7 +311,7 @@ public class AdapterSearchPeers extends RecyclerView.Adapter<AdapterSearchPeers.
         return modelPeers.size();
     }
 
-
+        /////INITIATE IDs
     public static class HolderPeers extends RecyclerView.ViewHolder {
 
         private ImageView avatarIv;
