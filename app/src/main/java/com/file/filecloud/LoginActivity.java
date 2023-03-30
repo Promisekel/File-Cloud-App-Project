@@ -22,7 +22,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.file.filecloud.Firebase.NetworkConnection;
 import com.file.filecloud.Tabs.Sign_Up;
 import com.file.cloud.R;
 import com.google.android.gms.tasks.OnCompleteListener;

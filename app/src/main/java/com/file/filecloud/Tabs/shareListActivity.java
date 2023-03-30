@@ -314,6 +314,7 @@ shareListActivity extends AppCompatActivity {
         });
     }
 
+
     /*private void updateUserName(final String fname, final String sname, final android.app.AlertDialog dialog, final android.app.AlertDialog alertDialog) {
         final ProgressDialog progress = new ProgressDialog(shareListActivity.this);
         progress.setMessage("updating name please wait...");

@@ -96,7 +96,6 @@ public class Sign_Up extends AppCompatActivity {
                 }else {
                 RegisterUser( Email, Password );}
             }
-
         });
 
         mHaveAccount.setOnClickListener(v -> {
